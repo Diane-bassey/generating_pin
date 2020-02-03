@@ -1,0 +1,59 @@
+from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+import uuid #to generate a random pin security
+import os
+
+
+
+# init app object
+app = Flask(__name__)
+
+
+# set up database
+app.config["SECRET_KEY"] = "123456KEY"
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL") or "sqlite:///database.db"
+app.config["DATABASE_TRACK_MODIFITION"] = False
+
+# init db object
+db = SQLAlchemy(app)
+
+
+# create user class
+class Users(db.Model):
+    __tablename__ = 'users'
+    serial_id = db.Column(db.Integer, primary_key = True)
+    pin = db.Column(db.String(15), unique=True, nullable=False)
+
+    def __init__(self, pin):
+        self.pin = pin
+db.create_all()
+
+
+#route
+@app.route("/pin", methods=["POST"])
+def  create_a_pin():
+    pinLength = 15
+    user = Users(pin=str(uuid.uuid4().hex).upper()[0:pinLength])
+    db.session.add(user)
+    db.session.commit()
+    return jsonify({"msg":"Pin created"})
+
+# validating a valid pin
+@app.route("/pin/<string:serial_id>", methods=["GET"])
+def  get_a_pin(serial_id):
+    result = Users.query.filter_by(serial_id=serial_id).first()
+    if not result:
+        return jsonify({"msg":"Invalid pin"})
+       
+    data = {}
+    data['serial_id'] = result.serial_id
+    data['pin'] = result.pin
+
+    return jsonify({'Valid pin':data})
+
+
+
+# run server
+if __name__ == "__main__":
+    app.run(debug=True)
+ 
