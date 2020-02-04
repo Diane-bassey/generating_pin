@@ -30,7 +30,7 @@ db.create_all()
 
 
 #route
-@app.route("/pins", methods=["POST"])
+@app.route("/pins", methods=["GET"])
 def  create_a_pin():
     pin_len = 15
     result = Users(pin=str(uuid.uuid4().int)[0:pin_len])
