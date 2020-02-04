@@ -34,7 +34,7 @@ db.create_all()
 def  create_a_pin():
     pin_len = 15
     result = Users(pin=str(uuid.uuid4().int)[0:pin_len])
-    db.session.add(user)
+    db.session.add(result)
     db.session.commit()
     return jsonify({"pin":result.pin, "serial_id":result.serial_id})
 
