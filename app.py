@@ -33,10 +33,12 @@ db.create_all()
 @app.route("/", methods=["GET"])
 def  create_a_pin():
     pin_len = 15
-    user = Users(pin=str(uuid.uuid4().int)[0:pin_len])
+    result = Users(pin=str(uuid.uuid4().int)[0:pin_len])
     db.session.add(user)
     db.session.commit()
-    return jsonify({"msg":"Pin created"})
+    return jsonify({"pin":result.pin, "serial_id":result.serial_id})
+
+
 
 # validating a valid pin
 @app.route("/pin/<string:serial_id>", methods=["GET"])
@@ -45,7 +47,7 @@ def  get_a_pin(serial_id):
     if not result:
         return jsonify({"msg":"Invalid pin"})
 
-    return jsonify({'Valid pin'})
+    return jsonify({"msg":"Valid pin"})
 
 
 
